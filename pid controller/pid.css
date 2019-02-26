@@ -1,0 +1,19 @@
+div{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+    height: 100px;
+  }
+  
+  #target{
+    background: red;
+    z-index: 0;
+  }
+  
+  #follower{
+    left: 20px;
+    top: 20px;
+    background: rgba(0, 0, 255, 0.8);
+    z-index: 1;
+  }
