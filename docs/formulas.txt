@@ -1,0 +1,108 @@
+Formulas
+
+Only lines of gcode with an X or Y need to be modified, all others can be ignored
+
+
+Final format for a line should be G(x) X(x) Y(x) A(x) B(x) then possibly also Z(x) C(x) F(x)
+
+
+Starting Points : X0=0 , Y0=0 , A0=0 , B0=0 (The subscripts are just for identification purposes and will not be included in the final gcode)
+
+
+Every Xn , Yn point will have a corresponding An , Bn point, this means that every Xn , Ynto Xn+1 , Yn+1 line segment will also have a corresponding An , Bn to An+1 , Bn+1 line segment.  
+
+
+Any code starting points are just ideas and can be disregarded if there is a better way.
+
+
+Current max straight line distance allowed between any Xn , Yn point and its corresponding An , Bn point is 100mm.  Anything less than this will be considered “close” and anything greater than this will be called “far”.  The same goes for the distance from a current An , Bn point to a future  Xn+m , Yn+m point.  Greater than 100mm will be “far” and less than 100mm will be “close”.
+
+
+There are four main situations of moves for X and Y which will need to be accounted for:
+
+An , Bn to Xn+1 , Yn+1 > 100mm & Xn+1 , Yn+1to Xn+2 , Yn+2> 100mm
+
+An , Bn to Xn+1 , Yn+1 > 100mm & Xn+1 , Yn+1to Xn+2 , Yn+2< 100mm
+
+An , Bn to Xn+1 , Yn+1 < 100mm & Xn+1 , Yn+1to Xn+2 , Yn+2< 100mm & Xm , Ym to Xm+1 , Ym+1< 100mm
+
+An , Bn to Xn+1 , Yn+1 < 100mm & Xn+1 , Yn+1to Xn+2 , Yn+2< 100mm & Xm , Ym to Xm+1 , Ym+1> 100mm
+
+
+
+
+For #1: “Cutting the corner” - Bisect the angle between the lines from Xn , Ynto Xn+1 , Yn+1and Xn+1 , Yn+1to Xn+2 , Yn+2.  An+1 , Bn+1will then be placed 100mm from Xn+1 , Yn+1 along the bisecting line.
+
+
+Code starting point:
+
+from sympy.geometry import Point, Circle, Triangle
+
+p1, p2, p3 = Point(Xn , Yn), Point(Xn+1 , Yn+1), Point (Xn+2 , Yn+2)
+
+t = Triangle(p1, p2, p3)
+
+r = 100
+
+c = Circle(p2, r)
+
+p4 = c.intersection(t.bisectors()[p2])
+
+
+p4 = An+1 , Bn+1
+
+
+
+For #2: Same as #1 but instead of An+1 , Bn+1 being 100mm from Xn+1 , Yn+1 along the bisecting line it will need to be half the distance from Xn+1 , Yn+1to Xn+2 , Yn+2 along the bisecting line.  
+
+
+Code starting point:
+
+from sympy.geometry import Point, Circle, Triangle, Line
+
+p1, p2, p3 = Point(Xn , Yn), Point(Xn+1 , Yn+1), Point (Xn+2 , Yn+2)
+
+t = Triangle(p1, p2, p3)
+
+l = Segment(p2, p3)
+
+r = (l.length)/2
+
+c = Circle(p2, r)
+
+p4 = c.intersection(t.bisectors()[p2])
+
+
+p4 = An+1 , Bn+1
+
+
+
+
+For #3:  When Xn+1 , Yn+1 is close to An , Bn then the distance from An , Bn to all the following X , Y points will need to be calculated until one is found to be more than 100mm away.  Call this point Xm+1 , Ym+1 with the last point still within 100mm now called Xm , Ym.  The total distance traveled by the X , Y system will need to calculated and added up between points Xn , Yn and Xm , Ym.  Call this distance XYfor now.  If the distance from Xm , Ym to Xm+1 , Ym+1 is also less than 100mm then the midpoint between Xm , Ym and Xm-1 , Ym-1 will need to be calculated.  Call this point Am , Bm.  The distance, AB, of the line from An , Bn to Am , Bm will then need to be calculated.  Next XY will need to be divided by ABto get the distance scaling factor.  The length of the line segment from Xn , Yn to Xn+1 , Yn+1 will then be divided by this scaling factor to determine the length of line from An , Bn to  An+1 , Bn+1 with An+1 , Bn+1 being placed that distance from An , Bn along the line to Am , Bm which was determined earlier.   At this point An+1 , Bn+1 and Xn+1 , Yn+1 will now become the new An , Bn and Xn , Yn and this whole process will be run again from the new starting points until reaching a point where Xm+1 , Ym+1 is more than 100mm from Xm , Ym.  
+
+
+Code starting point:
+
+Loop checking distance from An , Bn to Xn+1 , Yn+1is less than 100mm.  This loop can also sum the X , Y distance traveled as it checks each point in order.  Should probably also save the distance from Xn , Yn to Xn+1 , Yn+1 as its own variable since that number will be needed later.  
+
+Once Xm+1 , Ym+1 is found, Am , Bm can be determined by finding the midpoint from Xm , Ym and Xm-1 , Ym-1 using:
+
+
+from sympy.geometry import Point
+
+p1, p2 = Point(Xm-1 , Ym-1), Point(Xm , Ym)
+
+p1.midpoint(p2)
+
+
+Divide the total X , Y by the segment from An , Bn to Am , Bm then use that product to divide the segment from Xn , Yn to Xn+1 , Yn+1
+
+That length can then be used as the radius for a circle at point An , Bn and then intersected with the line from An , Bn to Am , Bm to find An+1 , Bn+1
+
+
+
+For #4:  Everything about this one will be the same as #3 except that Am , Bm will be placed at the “cutting the corner” location between Xm , Ym and Xm+1 , Ym+1.  The loop will then continue until An+1 , Bn+1 coincides with point Am , Bm .   This should result in either a #1 or #2 type of movement case.  
+
+
+
+All new An+1 , Bn+1 points will need to checked to make sure they are still within 100mm of their corresponding Xn+1 , Yn+1 point.  If they are more than 100mm away then they will need to me moved along a straight line to 100mm away from Xn+1 , Yn+1.  This would probably involve using the .intersection function of a 100mm radius circle centered at Xn+1 , Yn+1 intersecting a line from Xn+1 , Yn+1 to the current An+1 , Bn+1 to give the new An+1 , Bn+1 point.   
