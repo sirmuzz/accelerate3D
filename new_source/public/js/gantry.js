@@ -18,9 +18,9 @@ class Gantry {
     set PIDX_Kd( val ) { this._pidX.Kd = val; }
     set PIDX_Ki( val ) { this._pidX.Ki = val; }
 
-    set PIDY_Kp( val ) { this._pidX.Kp = val; }
-    set PIDY_Kd( val ) { this._pidX.Kd = val; }
-    set PIDY_Ki( val ) { this._pidX.Ki = val; }
+    set PIDY_Kp( val ) { this._pidY.Kp = val; }
+    set PIDY_Kd( val ) { this._pidY.Kd = val; }
+    set PIDY_Ki( val ) { this._pidY.Ki = val; }
 
 
     step( target_x, target_y ){
