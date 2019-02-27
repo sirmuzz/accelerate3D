@@ -1,0 +1,36 @@
+
+<!doctype html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>A3DTester</title>
+    <link rel="stylesheet" href="/css/pid.css">
+ </head>
+ <body>
+    <h1>Accelerate3D Test Platform</h1>
+    <div id="controller" class="controller">
+        <label for="pid_kp">Kp </label>
+        <input type="number" class="pid" id="pid_kp" min="0.00001" max="0.99999" value="0.01">
+        <label for="pid_ki">Ki </label>
+        <input type="number" class="pid" id="pid_ki" min="0.00001" max="0.99999" value="0.0004">
+        <label for="pid_kd">Kd </label>
+        <input type="number" class="pid" id="pid_kd" min="0.00001" max="0.99999" value="0.001">
+    </div>
+    <div id="gantry1" class="printer"></div>
+    <div id="gantry2" class="spooler"></div>
+    <script src= "/js/pid.js"></script>
+    <script src= "/js/gantry.js"></script>
+    <script src= "/js/a3d.js"></script>
+    <script>
+        var loadA3d = function(){
+            var a3d = new A3D( window, 0, 0 );
+        }
+
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", loadA3d);
+        } else {
+            loadA3d();
+        }
+    </script>
+ </body>
+</html>
