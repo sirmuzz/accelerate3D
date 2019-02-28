@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node node_server.js"
   },
+  "repository": { "url": "https://github.com/sirmuzz/accelerate3D.git" },
   "author": "",
   "license": "ISC",
   "dependencies": {
