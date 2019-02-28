@@ -128,9 +128,7 @@ class A3D {
         this.tick();
     }
   
-    draw() {
-            var width = 500;
-            var height = 500;
+    draw( width = 500, height = 500 ) {
             var canvas = this._canvas
             if (canvas.getContext) {
                 var context = canvas.getContext('2d');
