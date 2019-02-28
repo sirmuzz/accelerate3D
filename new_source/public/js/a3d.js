@@ -8,6 +8,7 @@ class A3D {
         this._vendors = ['webkit', 'moz', 'ms'];
         this._prefix = '';
         this._element = this._window.document.createElement('div');
+        this._canvas = this._window.document.createElement('canvas');
         this._gantry = new Gantry( start_x, start_y );
         this._gcode_data = "";
         this._lastLine = {x:0, y:0, z:0, e:0, f:0, extruding:false};
@@ -22,6 +23,14 @@ class A3D {
 
         this._gantry1 = this._window.document.getElementById(gantry1_id);
         this._gantry2 = this._window.document.getElementById(gantry2_id);
+
+        function onInterval(){
+            var a3d = window.a3d;
+            var offsetX = parseInt(Math.random() * a3d.animationWidth);
+            var offsetY = parseInt(Math.random() * a3d.animationHeight);
+            console.log("POSX:" + offsetX + " POSY:" + offsetY);
+            a3d._gantry1.style[a3d._prefix + 'transform'] = 'translate3d(' + offsetX + 'px, ' + offsetY + 'px, 0)';
+        }
         
         function onPidControl() {
             var a3d = window.a3d;
@@ -54,12 +63,7 @@ class A3D {
             a3d.speed = speedometer.value;
 
             clearInterval(a3d._interval);
-            a3d._interval = setInterval(function(){
-                var a3d = window.a3d;
-                var offsetX = parseInt(Math.random() * a3d.animationWidth);
-                var offsetY = parseInt(Math.random() * a3d.animationHeight);
-                a3d._gantry1.style[a3d._prefix + 'transform'] = 'translate3d(' + offsetX + 'px, ' + offsetY + 'px, 0)';
-            }, a3d.speed);
+            a3d._interval = setInterval( onInterval, this.speed );
             console.log("Speed Change: " + a3d.speed);
         };
 
@@ -106,12 +110,7 @@ class A3D {
         this._gantry1.style[this._prefix + 'transform'] = 'translate3d(' + start_x + 'px, ' + start_y + 'px, 0)';
         this._gantry2.style[this._prefix + 'transform'] = 'translate3d(' + start_x + 'px, ' + start_y + 'px, 0)';
 
-        this._interval = setInterval(function(){
-            var a3d = window.a3d;
-            var offsetX = parseInt(Math.random() * a3d.animationWidth);
-            var offsetY = parseInt(Math.random() * a3d.animationHeight);
-            a3d._gantry1.style[a3d._prefix + 'transform'] = 'translate3d(' + offsetX + 'px, ' + offsetY + 'px, 0)';
-        }, this.speed);
+        this._interval = setInterval( onInterval, this.speed);
 
         this.tick();
     }
@@ -244,12 +243,12 @@ class A3D {
     }
 
     setCurrentPosition( element, offsetX, offsetY ){
-        var radius1 = this._gantry1.offsetWidth / 2;
+        var radius = this._gantry1.offsetWidth / 2;
         var radius2 = this._gantry2.offsetWidth / 2;
-
-        // offsetX += radius;
-        // offsetY += radius;
-        element.style[this._prefix + 'transform'] = 'translate3d(' + offsetX + 'px,' + offsetY + 'px, 0)';
+        var posX = offsetX + ( radius - radius2 );
+        var posY = offsetY + ( radius - radius2 );
+        
+        element.style[this._prefix + 'transform'] = 'translate3d(' + posX + 'px,' + posY + 'px, 0)';
     }
 
     setPID( Kp, Kd, Ki ){
