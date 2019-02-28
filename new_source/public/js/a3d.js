@@ -1,7 +1,7 @@
 class A3D {
     constructor(window, start_x = 0, start_y = 0, controller_id = "controller", gantry1_id = "gantry1", gantry2_id = "gantry2" ){
-        this.animationWidth = 800;
-        this.animationHeight = 500;
+        this.animationWidth = 400;
+        this.animationHeight = 400;
         this.speed = 1000;
         window.a3d = this;
         this._window = window;
