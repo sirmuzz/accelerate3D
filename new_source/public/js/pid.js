@@ -1,5 +1,5 @@
 class PIDController {
-    constructor( Kp = 0.01, Ki = 0.004, Kd = 0.001 ){
+    constructor( Kp = 0.01, Ki = 0.001, Kd = 0.001 ){
         this._currentTime = performance.now();
         this._initialTime = this._currentTime;
         this._deltaTime = 0;

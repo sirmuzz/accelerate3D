@@ -7,40 +7,53 @@
     <link rel="stylesheet" href="/css/pid.css">
  </head>
  <body>
+
     <h1>Accelerate3D Test Platform</h1>
+    <div class="container">
+        <div id="gantry1" class="device printer"></div>
+        <div id="gantry2" class="device spooler"></div>
+        <canvas id="canvas"></canvas>
+    </div>
     <div id="controller" class="controller">
         <p>
             <label for="gcode_file">GCode File</label>
             <input id='gcode_file' class="labeled" type='file' name='gcode_file'/>
         </p>
         <p>
-            <label for="pid_kp">Kp </label>
+            <label for="pid_kp">Kp: </label>
             <input type="number" class="pid labeled" id="pid_kp" min="0.001" max="1.0" value="0.05" step="0.01">
-            <label for="pid_ki">Ki </label>
+            <label for="pid_ki">Ki: </label>
             <input type="number" class="pid labeled" id="pid_ki" min="0.0001" max="0.001" value="0.005" step="0.0001">
-            <label for="pid_kd">Kd </label>
+            <label for="pid_kd">Kd: </label>
             <input type="number" class="pid labeled" id="pid_kd" min="0.00001" max="0.1" value="0.01" step="0.00001">
+            <input type="button" class="pid labeled" id="pid_update" value="Refresh">
         </p>
         <p>
-                <label for="g1_size">Gantry 1 Sz</label>
+                <label for="g1_size">Gantry 1 Sz: </label>
                 <input type="number" class="pid labeled" id="g1_size" min="10" max="100" value="10">
-                <label for="g2_size">Gantry 2 Sz</label>
+                <label for="g2_size">Gantry 2 Sz: </label>
                 <input type="number" class="pid labeled" id="g2_size" min="10" max="100" value="10">
+        </p>
+        <p>
+                <label for="bed_size_x">Bed Size X: </label>
+                <input type="number" class="pid labeled" id="bed_size_x" min="100" max="10000" value="500">
+                <label for="bed_size_y">Bed Size Y: </label>
+                <input type="number" class="pid labeled" id="bed_size_y" min="100" max="10000" value="500">
         </p>
         <p>
                 <label for="speed">Speed </label>
                 <input type="number" class="pid labeled" id="speed" min="10" max="100000000" value="1000" step="50">
         </p>
+        <p id='showCoords'></p>
     </div>
-    <div id="gantry1" class="printer"></div>
-    <div id="gantry2" class="spooler"></div>
+    
     <script src= "/js/pid.js"></script>
     <script src= "/js/gantry.js"></script>
     <script src= "/js/parser.js"></script>
     <script src= "/js/a3d.js"></script>
     <script>
         var loadA3d = function(){
-            var a3d = new A3D( window, 0, 0 );
+            var a3d = new A3D( window, 10, 100 );
         }
 
         if (document.readyState === "loading") {

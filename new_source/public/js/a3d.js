@@ -1,5 +1,5 @@
 class A3D {
-    constructor(window, start_x = 0, start_y = 0, controller_id = "controller", gantry1_id = "gantry1", gantry2_id = "gantry2" ){
+    constructor(window, start_x = 0, start_y = 0, gantry1_id = "gantry1", gantry2_id = "gantry2" ){
         this.animationWidth = 400;
         this.animationHeight = 400;
         this.speed = 1000;
@@ -7,14 +7,14 @@ class A3D {
         this._window = window;
         this._vendors = ['webkit', 'moz', 'ms'];
         this._prefix = '';
-        this._element = this._window.document.createElement('div');
-        this._canvas = this._window.document.createElement('canvas');
+        
         this._gantry = new Gantry( start_x, start_y );
         this._gcode_data = "";
         this._lastLine = {x:0, y:0, z:0, e:0, f:0, extruding:false};
         this._relative = false;
         this._interval = 0;
 
+        this._element = this._window.document.createElement('div');
         for(var i in this._vendors){
             if(['-' + this._vendors[i] + '-transform'] in this._element.style){
                 this._prefix = '-' + this._vendors[i] + '-';
@@ -37,6 +37,9 @@ class A3D {
             var pid_kp = window.document.getElementById("pid_kp").value;
             var pid_ki = window.document.getElementById("pid_ki").value;
             var pid_kd = window.document.getElementById("pid_kd").value;
+            if( isNaN(pid_kp) ){ return; }
+            if( isNaN(pid_ki) ){ return; }
+            if( isNaN(pid_kd) ){ return; }
             a3d.setPID( pid_kp, pid_ki, pid_kd );
             console.log("PID Change: Kp=" + pid_kp + " Ki=" + pid_ki + " Kd=" + pid_kd);
         };
@@ -67,6 +70,15 @@ class A3D {
             console.log("Speed Change: " + a3d.speed);
         };
 
+        this._canvas = this._window.document.getElementById('canvas');
+        this._canvas.addEventListener("click", showCoords);
+        //this._canvas.addEventListener("mousemove", showCoords);
+        this._canvas.width = 500;
+        this._canvas.height = 500;
+        this.draw();
+
+        
+
         var speedometer = document.getElementById('speed');
         speedometer.addEventListener('change', onSpeedChange);
         this.speed = speedometer.value;
@@ -90,6 +102,7 @@ class A3D {
         pid_kp.addEventListener('input', onPidControl);
         pid_ki.addEventListener('input', onPidControl);
         pid_kd.addEventListener('input', onPidControl);
+        window.document.getElementById('pid_update').addEventListener('click', onPidControl);
 
         document.getElementById('gcode_file').addEventListener('input', openDialog);
 
@@ -114,6 +127,32 @@ class A3D {
 
         this.tick();
     }
+  
+    draw() {
+            var width = 500;
+            var height = 500;
+            var canvas = this._canvas
+            if (canvas.getContext) {
+                var context = canvas.getContext('2d');
+
+            for(var x=0.5;x<width;x+=10) {
+                context.moveTo(x,0);
+                context.lineTo(x,width);
+            }
+
+            for(var y=0.5; y<height; y+=10) {
+                context.moveTo(0,y);
+                context.lineTo(height,y);
+
+            }
+
+            context.strokeStyle='grey';
+            context.stroke();
+
+            }
+    }
+  
+    
 
     parseGCodeData( gcode_data ) {
         this._gcode_data = gcode_data;
